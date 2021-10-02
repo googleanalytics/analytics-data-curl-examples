@@ -37,14 +37,92 @@ gcloud auth application-default login \
 
 # This variable contains the JSON request text that will be passed to the API
 # method.
+# [START analyticsdata_run_report_with_pagination_page1]
 read -r -d '' REQUEST_JSON_DATA << EOM
-
+{
+  "dimensions": [
+    {
+      "name": "firstUserSource"
+    },
+    {
+      "name": "firstUserMedium"
+    },
+    {
+      "name": "firstUserCampaignName"
+    }
+  ],
+  "metrics": [
+    {
+      "name": "sessions"
+    },
+    {
+      "name": "conversions"
+    },
+    {
+      "name": "totalRevenue"
+    }
+  ],
+  "dateRanges": [
+    {
+      "startDate": "365daysAgo",
+      "name": "yesterday"
+    }
+  ],
+  "limit": 100000,
+  "offset": 0
+}
 EOM
-
 curl -X POST \
   -H "Authorization: Bearer "$(gcloud auth application-default print-access-token) \
   -H "Content-Type: application/json; charset=utf-8" \
   https://analyticsdata.googleapis.com/v1beta/properties/$GA4_PROPERTY_ID:runReport \
   -d  "$REQUEST_JSON_DATA"
+# [END analyticsdata_run_report_with_pagination_page1]
+
+# Run the same report with a different offset value to retrieve the second
+# page of a response.
+# [START analyticsdata_run_report_with_pagination_page2]
+read -r -d '' REQUEST_JSON_DATA << EOM
+{
+  "dimensions": [
+    {
+      "name": "firstUserSource"
+    },
+    {
+      "name": "firstUserMedium"
+    },
+    {
+      "name": "firstUserCampaignName"
+    }
+  ],
+  "metrics": [
+    {
+      "name": "sessions"
+    },
+    {
+      "name": "conversions"
+    },
+    {
+      "name": "totalRevenue"
+    }
+  ],
+  "dateRanges": [
+    {
+      "startDate": "365daysAgo",
+      "name": "yesterday"
+    }
+  ],
+  "limit": 100000,
+  "offset": 100000
+}
+EOM
+curl -X POST \
+  -H "Authorization: Bearer "$(gcloud auth application-default print-access-token) \
+  -H "Content-Type: application/json; charset=utf-8" \
+  https://analyticsdata.googleapis.com/v1beta/properties/$GA4_PROPERTY_ID:runReport \
+  -d  "$REQUEST_JSON_DATA"
+# [END analyticsdata_run_report_with_pagination_page2]
+
+
 # [END analyticsdata_run_report_with_pagination]
 

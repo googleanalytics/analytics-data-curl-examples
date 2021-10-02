@@ -14,17 +14,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Google Analytics Data API sample application retrieving dimension and metrics
-# metadata.
+# Google Analytics Data API sample application demonstrating the usage of
+# property quota metadata.
 #
-# See https://developers.google.com/analytics/devguides/reporting/data/v1/rest/v1beta/properties/getMetadata
+# See https://developers.google.com/analytics/devguides/reporting/data/v1/rest/v1beta/properties/runReport#body.request_body.FIELDS.return_property_quota
 # for more information.
 
-# [START analyticsdata_get_common_metadata]
-# Set the Property ID to 0 for dimensions and metrics common
-# to all properties. In this special mode, this method will
-# not return custom dimensions and metrics.
-export GA4_PROPERTY_ID=0
+# [START analyticsdata_run_report_with_property_quota]
+# TODO(developer): Replace this variable with your Google Analytics 4
+#  property ID before running the sample.
+export GA4_PROPERTY_ID=[YOUR-GA4-PROPERTY-ID]
 
 # TODO(developer): Replace this variable with a path to your OAuth2 credentials
 #  JSON file. See https://developers.google.com/analytics/devguides/reporting/data/v1/quickstart-cli
@@ -33,15 +32,36 @@ export CREDENTIALS_JSON_PATH="[PATH/TO/credentials.json]"
 
 # Login using your OAuth2 credentials.
 gcloud auth application-default login \
-  --scopes=https://www.googleapis.com/auth/analytics.readonly \
-  --client-id-file=$CREDENTIALS_JSON_PATH
+    --scopes=https://www.googleapis.com/auth/analytics.readonly \
+    --client-id-file=$CREDENTIALS_JSON_PATH
 
+# This variable contains the JSON request text that will be passed to the API
+# method.
+read -r -d '' REQUEST_JSON_DATA << EOM
+{
+  "dimensions": [
+    {
+      "name": "country"
+    }
+  ],
+  "metrics": [
+    {
+      "name": "activeUsers"
+    }
+  ],
+  "dateRanges": [
+    {
+      "startDate": "7daysAgo",
+      "name": "today"
+    }
+  ],
+  "returnPropertyQuota": true
+}
+EOM
 
-# Retrieves dimensions and metrics available for all Google Analytics 4
-#  properties.
-curl \
+curl -X POST \
   -H "Authorization: Bearer "$(gcloud auth application-default print-access-token) \
   -H "Content-Type: application/json; charset=utf-8" \
-  https://analyticsdata.googleapis.com/v1beta/properties/$GA4_PROPERTY_ID/metadata
-
-# [END analyticsdata_get_common_metadata]
+  https://analyticsdata.googleapis.com/v1beta/properties/$GA4_PROPERTY_ID:runReport \
+  -d  "$REQUEST_JSON_DATA"
+# [END analyticsdata_run_report_with_property_quota]

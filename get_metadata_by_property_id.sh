@@ -20,11 +20,10 @@
 # See https://developers.google.com/analytics/devguides/reporting/data/v1/rest/v1beta/properties/getMetadata
 # for more information.
 
-# [START analyticsdata_get_common_metadata]
-# Set the Property ID to 0 for dimensions and metrics common
-# to all properties. In this special mode, this method will
-# not return custom dimensions and metrics.
-export GA4_PROPERTY_ID=0
+# [START analyticsdata_get_metadata_by_property_id]
+# TODO(developer): Replace this variable with your Google Analytics 4
+#  property ID before running the sample.
+export GA4_PROPERTY_ID=[YOUR-GA4-PROPERTY-ID]
 
 # TODO(developer): Replace this variable with a path to your OAuth2 credentials
 #  JSON file. See https://developers.google.com/analytics/devguides/reporting/data/v1/quickstart-cli
@@ -37,11 +36,11 @@ gcloud auth application-default login \
   --client-id-file=$CREDENTIALS_JSON_PATH
 
 
-# Retrieves dimensions and metrics available for all Google Analytics 4
-#  properties.
+# Retrieves dimensions and metrics available for a Google Analytics 4
+#  property, including custom fields.
 curl \
   -H "Authorization: Bearer "$(gcloud auth application-default print-access-token) \
   -H "Content-Type: application/json; charset=utf-8" \
   https://analyticsdata.googleapis.com/v1beta/properties/$GA4_PROPERTY_ID/metadata
 
-# [END analyticsdata_get_common_metadata]
+# [END analyticsdata_get_metadata_by_property_id]

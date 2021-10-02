@@ -14,13 +14,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Google Analytics Data API sample application demonstrating the creation of
-# a pivot report.
+# Google Analytics Data API sample application demonstrating the batch creation
+# of multiple reports.
 #
-# See https://developers.google.com/analytics/devguides/reporting/data/v1/rest/v1beta/properties/runPivotReport
+# See https://developers.google.com/analytics/devguides/reporting/data/v1/rest/v1beta/properties/batchRunReports
 # for more information.
 
-# [START analyticsdata_run_pivot_report]
+# [START analyticsdata_run_batch_report]
 # TODO(developer): Replace this variable with your Google Analytics 4
 #  property ID before running the sample.
 export GA4_PROPERTY_ID=[YOUR-GA4-PROPERTY-ID]
@@ -36,58 +36,52 @@ gcloud auth application-default login \
     --client-id-file=$CREDENTIALS_JSON_PATH
 
 # This variable contains the JSON request text that will be passed to the API
-#  method.
-# Runs a pivot query to build a report of session counts by country,
-#  pivoted by the browser dimension.
+# method.
+# Runs a batch report on a Google Analytics 4 property.
 read -r -d '' REQUEST_JSON_DATA << EOM
 {
-  "dateRanges": [
+  "requests": [
     {
-      "startDate": "2021-01-01",
-      "endDate": "2021-01-30"
-    }
-  ],
-  "pivots": [
-    {
-      "fieldNames": [
-        "country"
-      ],
-      "limit": 250,
-      "orderBys": [
+      "dimensions": [
         {
-          "dimension": {
-            "dimensionName": "country"
-          }
+          "name": "country"
+        },
+        {
+          "name": "region"
+        },
+        {
+          "name": "city"
+        }
+      ],
+      "metrics": [
+        {
+          "name": "activeUsers"
+        }
+      ],
+      "dateRanges": [
+        {
+          "startDate": "2021-01-03",
+          "endDate": "2021-01-09"
         }
       ]
     },
     {
-      "fieldNames": [
-        "browser"
-      ],
-      "offset": 3,
-      "limit": 3,
-      "orderBys": [
+      "dimensions": [
         {
-          "metric": {
-            "metricName": "sessions"
-          },
-          "desc": true
+          "name": "browser"
+        }
+      ],
+      "metrics": [
+        {
+          "name": "activeUsers"
+        }
+      ],
+      "dateRanges": [
+        {
+          "startDate": "2021-01-01",
+          "endDate": "2021-01-31"
         }
       ]
-    }
-  ],
-  "metrics": [
-    {
-      "name": "sessions"
-    }
-  ],
-  "dimensions": [
-    {
-      "name": "country"
-    },
-    {
-      "name": "browser"
     }
   ]
 }
@@ -96,6 +90,6 @@ EOM
 curl -X POST \
   -H "Authorization: Bearer "$(gcloud auth application-default print-access-token) \
   -H "Content-Type: application/json; charset=utf-8" \
-  https://analyticsdata.googleapis.com/v1beta/properties/$GA4_PROPERTY_ID:runPivotReport \
+  https://analyticsdata.googleapis.com/v1beta/properties/$GA4_PROPERTY_ID:runBatchReport \
   -d  "$REQUEST_JSON_DATA"
-# [END analyticsdata_run_pivot_report]
+# [END analyticsdata_run_batch_report]
